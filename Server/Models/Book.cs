@@ -35,5 +35,10 @@ namespace Server.Models
         {
             return this.Quality < Book.MINIMUM_ACCEPTABLE_QUALITY;
         }
+
+        public override string ToString()
+        {
+            return $"Id: {this.Id}, Title: {this.Title}, Author: {this.Author}, Quality: {this.Quality}";
+        }
     }
 }

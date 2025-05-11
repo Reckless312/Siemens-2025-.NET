@@ -24,7 +24,7 @@ namespace Server.Controllers
         }
 
         [HttpPost ("add")]
-        public async Task<bool> AddBook(String title, String author, int quality)
+        public async Task AddBook(String title, String author, int quality)
         {
             bool isBookContentValid = BookValidator.ValidateEntry(title, author, quality);
 
@@ -32,43 +32,50 @@ namespace Server.Controllers
             {
                 case true:
                     await this.repository.Add(title, author, quality);
-                    return true;
+                    Ok();
+                    break;
                 case false:
-                    return false;
+                    BadRequest();
+                    break;
             }
         }
 
         [HttpDelete ("delete/{id}")]
-        public bool DeleteOneBookAppearance(String id)
+        public async Task DeleteOneBookAppearance(int id)
         {
-            // TO DO: Connect to Repo (check if it exists)
-
-            bool isIdValid = true;
+            bool isIdValid = await this.repository.DoesBookExistsById(id);
 
             // Extra: Check if it's rented
 
             switch (isIdValid)
             {
                 case true:
-                    // TO DO: Connect to Repo (delete the entry)
+                    await this.repository.Delete(id);
+                    Ok();
                     break;
                 case false:
+                    BadRequest();
                     break;
             }
-
-            return true;
         }
 
-        [HttpDelete ("delete/{author}/{title}")]
-        public bool DeleteAllAppearancesOfABook(String title, String author)
+        [HttpDelete ("delete/{title}/{author}")]
+        public async Task DeleteAllAppearancesOfABook(String title, String author)
         {
-            // TO DO: Connect To Repo (check if it exists)
+            bool isIdValid = await this.repository.DoesBookExistsByTitleAndAuthor(title, author);
 
             // TO DO: Check if there exists a book which is rented
 
-            // TO DO: Delete all of them
-
-            return true;
+            switch (isIdValid)
+            {
+                case true:
+                    await this.repository.DeleteAllOccurences(title, author);
+                    Ok();
+                    break;
+                case false:
+                    BadRequest();
+                    break;
+            }
         }
 
         [HttpPatch ("update/quality")]
