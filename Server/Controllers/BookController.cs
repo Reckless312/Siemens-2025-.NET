@@ -79,27 +79,41 @@ namespace Server.Controllers
         }
 
         [HttpPatch ("update/quality")]
-        public bool UpdateOneBook(int id, int quality)
+        public async Task UpdateOneBook(int id, int quality)
         {
-            // TO DO: Check if it exists
+            bool isIdValid = await this.repository.DoesBookExistsById(id);
 
-            // TO DO: Check if it rented
+            // Extra: Check if it's rented
 
-            // TO DO: Update the book
-
-            return true;
+            switch (isIdValid)
+            {
+                case true:
+                    await this.repository.UpdateQuality(id, quality);
+                    Ok();
+                    break;
+                case false:
+                    BadRequest();
+                    break;
+            }
         }
 
         [HttpPatch ("update")]
-        public bool UpdateBook(int id, String newTitle, String newAuthor, int newQuality)
+        public async Task UpdateBook(String title, String author, String newTitle)
         {
-            // TO DO: Check if it exists
+            bool isIdValid = await this.repository.DoesBookExistsByTitleAndAuthor(title, author);
 
-            // TO DO: Check if it rented
+            // TO DO: Check if there exists a book which is rented
 
-            // TO DO: Update the book
-
-            return true;
+            switch (isIdValid)
+            {
+                case true:
+                    await this.repository.UpdateBook(title, author, newTitle);
+                    Ok();
+                    break;
+                case false:
+                    BadRequest();
+                    break;
+            }
         }
     }
 }

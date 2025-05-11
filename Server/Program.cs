@@ -38,6 +38,8 @@ void ShowCommands()
     Console.WriteLine("2) add <book_title> <book_author> <book_quality>");
     Console.WriteLine("3) delete-one <book_id>");
     Console.WriteLine("4) delete-all <book_title> <book_author>");
+    Console.WriteLine("5) update-quality <book_id> <new_book_quality>");
+    Console.WriteLine("6) update-title <book_title> <book_author> <new_book_title>");
 }
 
 Thread commandThread = new Thread(async () =>
@@ -50,6 +52,10 @@ Thread commandThread = new Thread(async () =>
     const String REMOVE_ONE_BOOK_COMMAND = "delete-one";
     const String REMOVE_BOOK_ROUTE = "/api/books/delete/";
     const String REMOVE_BOOKS_COMMAND = "delete-all";
+    const String UPDATE_QUALITY_COMMAND = "update-quality";
+    const String UPDATE_QUALITY_ROUTE = "/api/books/update/quality";
+    const String UPDATE_TITLE_COMMAND = "update-title";
+    const String UPDATE_TITLE_ROUTE = "/api/books/update";
 
 
     const int MAIN_COMMAND_INDEX = 0;
@@ -63,6 +69,13 @@ Thread commandThread = new Thread(async () =>
     const int REMOVE_BOOKS_COMMAND_LENGTH = 3;
     const int REMOVE_TITLE_INDEX = 1;
     const int REMOVE_AUTHOR_INDEX = 2;
+    const int UPDATE_QUALITY_COMMAND_LENGTH = 3;
+    const int UPDATE_TITLE_COMMAND_LENGTH = 4;
+    const int UPDATE_QUALITY_ID_INDEX = 1;
+    const int UPDATE_QUALITY_INDEX = 2;
+    const int UPDATE_TITLE_INDEX = 1;
+    const int UPDATE_TITLE_AUTHOR_INDEX = 2;
+    const int UPDATE_TITLE_NEW_TITLE_INDEX = 3;
 
     HttpClient client = new HttpClient();
     client.BaseAddress = new Uri(BASE_URL);
@@ -163,6 +176,50 @@ Thread commandThread = new Thread(async () =>
                     Console.WriteLine("Something went wrong!");
                     ShowCommands();
                     continue;
+                }
+                break;
+            case UPDATE_QUALITY_COMMAND:
+                if (inputKeywords.Length != UPDATE_QUALITY_COMMAND_LENGTH)
+                {
+                    Console.WriteLine("Invalid update quality command!");
+                    ShowCommands();
+                    continue;
+                }
+
+                String qualityQuery = $"?id={inputKeywords[UPDATE_QUALITY_ID_INDEX]}" + $"&quality={inputKeywords[UPDATE_QUALITY_INDEX]}";
+
+                HttpResponseMessage qualityUpdateResponse = await client.PatchAsync(UPDATE_QUALITY_ROUTE + qualityQuery, null);
+
+                if (!qualityUpdateResponse.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Something went wrong!");
+                }
+                else
+                {
+                    Console.WriteLine("Book quality updated succesfully!");
+                }
+                break;
+            case UPDATE_TITLE_COMMAND:
+                if (inputKeywords.Length != UPDATE_TITLE_COMMAND_LENGTH)
+                {
+                    Console.WriteLine("Invalid update title command!");
+                    ShowCommands();
+                    continue;
+                }
+
+                String updateTitleQuery = $"?title={Uri.EscapeDataString(inputKeywords[UPDATE_TITLE_INDEX].Replace('-', ' '))}" +
+                               $"&author={Uri.EscapeDataString(inputKeywords[UPDATE_TITLE_AUTHOR_INDEX].Replace('-', ' '))}" +
+                               $"&newTitle={Uri.EscapeDataString(inputKeywords[UPDATE_TITLE_NEW_TITLE_INDEX].Replace('-', ' '))}";
+
+                HttpResponseMessage updateTitleResponse = await client.PatchAsync(UPDATE_TITLE_ROUTE + updateTitleQuery, null);
+
+                if (!updateTitleResponse.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Something went wrong!");
+                }
+                else
+                {
+                    Console.WriteLine("Book title updated succesfully!");
                 }
                 break;
         }

@@ -69,5 +69,31 @@ namespace Server.Repository
         {
             return await this.database.Books.Where(book => book.Title == title && book.Author == author).ToListAsync();
         }
+
+        public async Task UpdateQuality(int id, int quality)
+        {
+            Book? book = await this.GetBookById(id);
+
+            if (book != null)
+            {
+                book.Quality = quality;
+                this.database.Update(book);
+            }
+
+            await this.database.SaveChangesAsync();
+        }
+
+        public async Task UpdateBook(String title, String author, String newTitle)
+        {
+            List<Book> books = await this.GetBooksByTitleAndAuthor(title, author);
+
+            foreach (Book book in books)
+            {
+                book.Title = newTitle;
+                this.database.Update(book);
+            }
+
+            await this.database.SaveChangesAsync();
+        }
     }
 }
