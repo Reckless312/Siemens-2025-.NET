@@ -1,7 +1,12 @@
-﻿namespace Server.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Server.Models
 {
     public class Book
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
         public String Title { get; set; }
         public String Author { get; set; }
@@ -19,9 +24,8 @@
         public const int MINIMUM_QUALITY = 0;
         public const int MAXIMUM_QUALITY = 10;
 
-        public Book(int id, String title, String author, int quality)
+        public Book(String title, String author, int quality)
         {
-            this.Id = id;
             this.Title = title;
             this.Author = author;
             this.Quality = quality;

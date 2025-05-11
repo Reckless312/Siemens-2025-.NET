@@ -10,39 +10,32 @@ namespace Server.Controllers
     [ApiController]
     public class BookController : ControllerBase
     {
-        private int NewId { get; set; }
-
         private BookRepository repository;
 
         public BookController(BookRepository repository)
         {
-            // TO DO: Make a function in the entity framework to get the last id added
             this.repository = repository;
-            this.NewId = 1;
         }
 
         [HttpGet]
-        public List<Book> GetAllBooks()
+        public async Task<List<Book>> GetAllBooks()
         {
-            // TO DO: Connect to the repo
-            return new List<Book>();
+            return await this.repository.GetBooks();
         }
 
         [HttpPost ("add")]
-        public bool AddBook(String title, String author, int quality)
+        public async Task<bool> AddBook(String title, String author, int quality)
         {
             bool isBookContentValid = BookValidator.ValidateEntry(title, author, quality);
 
             switch (isBookContentValid)
             {
                 case true:
-                    // TO DO: Connect to Repo
-                    break;
+                    await this.repository.Add(title, author, quality);
+                    return true;
                 case false:
                     return false;
             }
-
-            return true;
         }
 
         [HttpDelete ("delete/{id}")]
