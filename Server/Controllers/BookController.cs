@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Server.Models;
+using Server.Repository;
 using Server.Validators;
 
 namespace Server.Controllers
@@ -11,9 +12,12 @@ namespace Server.Controllers
     {
         private int NewId { get; set; }
 
-        public BookController()
+        private BookRepository repository;
+
+        public BookController(BookRepository repository)
         {
             // TO DO: Make a function in the entity framework to get the last id added
+            this.repository = repository;
             this.NewId = 1;
         }
 
